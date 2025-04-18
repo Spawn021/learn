@@ -9,7 +9,6 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true,
     }),
   ) // Validate incoming requests and strip out any properties that are not defined in the DTOs
   const configService = app.get(ConfigService)
