@@ -10,3 +10,10 @@ export class CreateAuthDto {
   @IsOptional()
   name: string
 }
+export class VerifyAuthDto {
+  @IsNotEmpty()
+  _id: string
+
+  @IsNotEmpty()
+  code: string
+}

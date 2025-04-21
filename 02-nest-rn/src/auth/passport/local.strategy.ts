@@ -19,10 +19,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new HttpException(
         {
-          statusCode: HttpStatus.UNAUTHORIZED,
+          statusCode: HttpStatus.BAD_REQUEST,
           message: 'Invalid credentials',
         },
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.BAD_REQUEST,
       )
     }
     if (user.isActive === false) {

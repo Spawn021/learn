@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { User } from '@/modules/users/schemas/user.schema'
 import { Model } from 'mongoose'
 import aqp from 'api-query-params'
-import { CreateAuthDto } from '@/auth/dto/create-auth.dto'
+import { CreateAuthDto, VerifyAuthDto } from '@/auth/dto/create-auth.dto'
 import { v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs'
 import { MailerService } from '@nestjs-modules/mailer'
@@ -16,7 +16,7 @@ export class UsersService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     private readonly mailerService: MailerService,
-  ) {}
+  ) { }
 
   isEmailExist = async (email: string): Promise<boolean> => {
     const user = await this.userModel.findOne({ email })
@@ -146,6 +146,41 @@ export class UsersService {
     return {
       statusCode: 201,
       message: 'User registered successfully',
+      data: user,
+    }
+  }
+  async handleActive(verifyDto: VerifyAuthDto) {
+    const user = await this.userModel.findOne({
+      _id: verifyDto._id,
+      codeId: verifyDto.code,
+    })
+    if (!user) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Invalid activation code',
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    if (dayjs().isBefore(user.codeExpired)) {
+      await this.userModel.updateOne(
+        { _id: verifyDto._id },
+        { isActive: true, codeExpired: null, codeId: null },
+      )
+    }
+    else {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Activation code expired',
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+    return {
+      statusCode: 200,
+      message: 'User activated successfully',
       data: user,
     }
   }

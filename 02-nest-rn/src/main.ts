@@ -15,6 +15,14 @@ async function bootstrap() {
   const port = configService.get('PORT')
   app.setGlobalPrefix('api/v1', { exclude: [''] })
   app.useGlobalFilters(new AllExceptionsFilter())
+  app.enableCors(
+    {
+      "origin": true,
+      "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      "preflightContinue": false,
+      credentials: true
+    }
+  );
   await app.listen(port)
 }
 bootstrap()
